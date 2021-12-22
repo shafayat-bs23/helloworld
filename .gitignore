@@ -80,3 +80,5 @@ lint/tmp/
 # Others
 google-services.json
 Gemfile.lock
+.env.secret
+/certificates

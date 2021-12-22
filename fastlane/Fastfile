@@ -22,7 +22,7 @@ lane :release do
     build()
     # distribute_to_firebase()
     distribute_to_playstore()
-    # push_to_git_remote()
+    push_to_git()
 
 end
 
