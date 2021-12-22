@@ -109,7 +109,7 @@ lane :push_to_git do
     add_git_tag(
         build_number: "",
         grouping: "builds",
-        postfix: "" + updated_version_code_from_playstore,
+        postfix: updated_version_code_from_playstore.to_s,
         prefix: "prod-"
     )
     push_to_git_remote(
