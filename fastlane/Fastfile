@@ -9,7 +9,6 @@ firebase_project_id = "1:360676101691:android:618dada3efd4b88b56d61e"
 
 before_all do
 
-    Dotenv.overload ".env.secret"
     keystore_file_path = Dir.pwd + "/../certificates/keystore.jks"
     aab_file_path = Dir.pwd + "/../app/build/outputs/bundle/release/app-release.aab"
     playstore_app_distribution_access_key_file_path = Dir.pwd + "/../certificates/playstore-app-distribution-key.json"
