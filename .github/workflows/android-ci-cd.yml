@@ -67,4 +67,6 @@ jobs:
         run: |
           export LC_ALL=en_US.UTF-8
           export LANG=en_US.UTF-8
+          git config --global user.email ${{github.event.pusher.email}}
+          git config --global user.name ${{github.event.pusher.name}}
           bundle exec fastlane release
