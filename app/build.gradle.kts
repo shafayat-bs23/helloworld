@@ -14,7 +14,7 @@ android {
         applicationId = "com.shafayat.helloworld"
         minSdk = 19
         targetSdk = 30
-        versionCode = 3
+        versionCode = 5
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
