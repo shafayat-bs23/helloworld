@@ -6,6 +6,7 @@ package_name = "com.shafayat.helloworld"
 playstore_app_distribution_access_key_file_path = nil
 firebase_app_distribution_access_key_file_path = nil
 firebase_project_id = "1:360676101691:android:618dada3efd4b88b56d61e"
+updated_version_code_from_playstore = nil
 
 before_all do
 
@@ -105,10 +106,16 @@ lane :push_to_git do
         path: "*",
         message: "released"
     )
-
+    add_git_tag(
+        build_number: "",
+        grouping: "builds"
+        postfix: updated_version_code_from_playstore,
+        prefix: "prod-"
+    )
     push_to_git_remote(
         local_branch: "master",
         remote: "origin",
         remote_branch: "master",
+        tags: true
     )
 end
