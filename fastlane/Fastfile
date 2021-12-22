@@ -1,0 +1,115 @@
+fastlane_require "dotenv"
+
+keystore_file_path = nil
+aab_file_path = nil
+package_name = "com.shafayat.helloworld"
+playstore_app_distribution_access_key_file_path = nil
+firebase_app_distribution_access_key_file_path = nil
+firebase_project_id = "1:360676101691:android:618dada3efd4b88b56d61e"
+
+before_all do
+
+    Dotenv.overload ".env.secret"
+    keystore_file_path = Dir.pwd + "/../certificates/keystore.jks"
+    aab_file_path = Dir.pwd + "/../app/build/outputs/bundle/release/app-release.aab"
+    playstore_app_distribution_access_key_file_path = Dir.pwd + "/../certificates/playstore-app-distribution-key.json"
+    firebase_app_distribution_access_key_file_path = Dir.pwd + "/../certificates/firebase-app-distribution-key.json"
+end
+
+lane :release do
+
+    # run_unit_test()
+    update_version_code()
+    build()
+    # distribute_to_firebase()
+    distribute_to_playstore()
+    # push_to_git_remote()
+
+end
+
+
+# Unit test
+private_lane :run_unit_test do
+
+    gradle(
+        task: "test"
+    )
+
+end
+
+
+# Version code update
+private_lane :update_version_code do
+    # get version code from playstore
+    version_code_from_playstore = google_play_track_version_codes(
+        package_name: package_name,
+        track: "alpha",
+        json_key: playstore_app_distribution_access_key_file_path
+    )
+
+    # update version code
+    updated_version_code_from_playstore = version_code_from_playstore[0].to_i + 1
+
+    # change version code from gradle file
+    increment_version_code(
+        gradle_file_path: Dir.pwd + "/../app/build.gradle.kts",
+        version_code: updated_version_code_from_playstore.to_i
+    )
+
+end
+
+# Bundle file generation
+private_lane :build do
+
+    gradle(
+        task: "bundle",
+        build_type: "Release",
+        properties: {
+            "android.injected.signing.store.file" => keystore_file_path,
+            "android.injected.signing.store.password" => ENV['KEYSTORE_PASSWORD'],
+            "android.injected.signing.key.alias" => ENV['KEYSTORE_ALIAS'],
+            "android.injected.signing.key.password" => ENV['KEYSTORE_PASSWORD']
+        }
+    )
+
+end
+
+# Upload to firebase
+private_lane :distribute_to_firebase do
+
+    firebase_app_distribution(
+        app: firebase_project_id,
+        release_notes: "Fastlane integration done",
+        android_artifact_path: aab_file_path,
+        android_artifact_type: "AAB",
+        service_credentials_file: firebase_app_distribution_access_key_file_path
+    )
+
+end
+
+# Upload to playstore
+private_lane :distribute_to_playstore do
+    upload_to_play_store(
+        track: "alpha",
+        aab: aab_file_path,
+        json_key: playstore_app_distribution_access_key_file_path,
+        package_name:package_name,
+        skip_upload_apk: true
+    )
+end
+
+# Push to git
+lane :push_to_git do
+
+    git_add(path: "*")
+    git_commit(
+        path: "*",
+        message: "released"
+    )
+
+    push_to_git_remote(
+        local_branch: "master",
+        remote: "origin",
+        remote_branch: "master",
+    )
+end

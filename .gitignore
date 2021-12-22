@@ -79,3 +79,4 @@ lint/outputs/
 lint/tmp/
 # Others
 google-services.json
+Gemfile.lock
